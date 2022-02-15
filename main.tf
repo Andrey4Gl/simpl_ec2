@@ -85,15 +85,6 @@ resource "aws_instance" "server_ter01" {
   instance_type     = var.inst_type
   key_name          = var.key_name
 
-  /*
-  user_data = templatefile("user_data.sh.tpl", {
-    home_dir   = "/var/www/html/"
-    S_name     = "Ubuntu",
-    pm         = "apt",
-    instal_cmd = "apt -y install nginx-light",
-    auto_cmd   = "update-rc.d nginx defaults"
-  })
-*/
 
   user_data = templatefile("user_data.sh.tpl", var.dt_fl_ubuntu)
 
@@ -118,16 +109,6 @@ resource "aws_instance" "server_ter02" {
   ami               = data.aws_ami.latest_amazon_linux.id
   instance_type     = var.inst_type
   key_name          = var.key_name
-
-  /*
-  user_data = templatefile("user_data.sh.tpl", {
-    home_dir   = "/usr/share/nginx/html/",
-    S_name     = "Amazon Linux",
-    pm         = "yum",
-    instal_cmd = "amazon-linux-extras install nginx1 -y",
-    auto_cmd   = "chkconfig nginx on"
-  })
-*/
 
   user_data = templatefile("user_data.sh.tpl", var.df_fl_aml)
 

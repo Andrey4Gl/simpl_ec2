@@ -1,5 +1,6 @@
 # simpl_ec2
 Terraform script for ceation linux server (Ubuntu and Amazon Linux) in AWS ec2.
+
 On each set up nginx server and some start page
 
 ## Parametrs define in variables.tf file:
