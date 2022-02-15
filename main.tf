@@ -1,5 +1,6 @@
 #---------------------------------------------------------------------
-# Output data (tamplate file)
+# Scripts for ceation linux server (Ubuntu or Amazon Linux) in AWS ec2.
+# Main script
 # TF (c) AG 2021
 # Create resources
 #   - Elastic IP
@@ -9,7 +10,7 @@
 #----------------------------------------------------------------------
 
 provider "aws" {
-  region = "eu-central-1"
+  region = var.region
 }
 
 data "aws_availability_zones" "working" {}
@@ -58,11 +59,21 @@ data "aws_vpc" "prod_vpc" {
 }
 */
 
-resource "aws_eip" "terr_static_ip" {
+resource "aws_eip" "terr_static_ub" {
   instance = aws_instance.server_ter01.id
   tags = {
-    Name  = "Terr_stat_ip"
-    Owner = "terraform_user"
+    Name  = "elc_ip_ub_${var.pr_name}"
+    Owner = var.pr_owner
+    Env   = var.env
+  }
+}
+
+resource "aws_eip" "terr_static_aml" {
+  instance = aws_instance.server_ter02.id
+  tags = {
+    Name  = "elc_ip_aml_${var.pr_name}"
+    Owner = var.pr_owner
+    Env   = var.env
   }
 }
 
@@ -71,9 +82,10 @@ resource "aws_eip" "terr_static_ip" {
 resource "aws_instance" "server_ter01" {
   availability_zone = data.aws_availability_zones.working.names[0]
   ami               = data.aws_ami.latest_ubuntu.id
-  instance_type     = "t2.micro"
-  key_name          = "ga-frank"
+  instance_type     = var.inst_type
+  key_name          = var.key_name
 
+  /*
   user_data = templatefile("user_data.sh.tpl", {
     home_dir   = "/var/www/html/"
     S_name     = "Ubuntu",
@@ -81,6 +93,9 @@ resource "aws_instance" "server_ter01" {
     instal_cmd = "apt -y install nginx-light",
     auto_cmd   = "update-rc.d nginx defaults"
   })
+*/
+
+  user_data = templatefile("user_data.sh.tpl", var.dt_fl_ubuntu)
 
   lifecycle {
     create_before_destroy = true
@@ -91,8 +106,9 @@ resource "aws_instance" "server_ter01" {
   # depends_on = []
 
   tags = {
-    Name  = "Ub_Server_ter"
-    Owner = "terraform_user"
+    Name  = "Ub_Server_${var.pr_name}"
+    Owner = var.pr_owner
+    Env   = var.env
   }
 }
 
@@ -100,9 +116,10 @@ resource "aws_instance" "server_ter01" {
 resource "aws_instance" "server_ter02" {
   availability_zone = data.aws_availability_zones.working.names[0]
   ami               = data.aws_ami.latest_amazon_linux.id
-  instance_type     = "t2.micro"
-  key_name          = "ga-frank"
+  instance_type     = var.inst_type
+  key_name          = var.key_name
 
+  /*
   user_data = templatefile("user_data.sh.tpl", {
     home_dir   = "/usr/share/nginx/html/",
     S_name     = "Amazon Linux",
@@ -110,6 +127,9 @@ resource "aws_instance" "server_ter02" {
     instal_cmd = "amazon-linux-extras install nginx1 -y",
     auto_cmd   = "chkconfig nginx on"
   })
+*/
+
+  user_data = templatefile("user_data.sh.tpl", var.df_fl_aml)
 
   lifecycle {
     create_before_destroy = true
@@ -120,18 +140,19 @@ resource "aws_instance" "server_ter02" {
   # depends_on = []
 
   tags = {
-    Name  = "Amazon_Linux_Server_5.10_ter"
-    Owner = "terraform_user"
+    Name  = "Amazon_Linux_Server_5.10_${var.pr_name}"
+    Owner = var.pr_owner
+    Env   = var.env
   }
 }
 
 
 resource "aws_security_group" "sg_ter01" {
-  name        = "sg_ter01_def"
-  description = "SG for web server from terrafom"
+  name        = "sg_${var.pr_name}"
+  description = "SG for web server for project ${var.pr_name}"
 
   dynamic "ingress" {
-    for_each = ["80", "443", "22"]
+    for_each = var.allow_ports
     content {
       from_port   = ingress.value
       to_port     = ingress.value
@@ -148,7 +169,7 @@ resource "aws_security_group" "sg_ter01" {
   }
 
   tags = {
-    Name  = "sg_ter01_def"
-    Owner = "terraform_user"
+    Name  = "sg_${var.pr_name}"
+    Owner = var.pr_owner
   }
 }

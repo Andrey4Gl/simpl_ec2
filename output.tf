@@ -1,5 +1,5 @@
 #---------------------------------------------------------------------
-# Output data (tamplate file)
+# Scripts for ceation linux server (Ubuntu or Amazon Linux) in AWS ec2.
 # TF (c) AG 2021
 # Outputs parameters:
 #   - Common parameters (user_id, region name, region description etc)
