@@ -33,10 +33,18 @@ output "latest_ami_ubuntu" {
   value = data.aws_ami.latest_ubuntu.name
 }
 
+output "latest_ami_ubuntu_id" {
+  value = data.aws_ami.latest_ubuntu.id
+}
 
 output "latest_ami_amazon" {
   value = data.aws_ami.latest_amazon_linux.name
 }
+
+output "latest_ami_amazon_id" {
+  value = data.aws_ami.latest_amazon_linux.id
+}
+
 
 # VPC resources
 
