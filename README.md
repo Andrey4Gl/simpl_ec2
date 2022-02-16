@@ -1,5 +1,5 @@
 # simpl_ec2
-Terraform script for ceation linux server (Ubuntu and Amazon Linux) in AWS ec2.
+Terraform simple script for creation linux server (Ubuntu and Amazon Linux) in AWS ec2.
 
 On each set up nginx server and some start page
 
