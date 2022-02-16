@@ -27,12 +27,17 @@ variable "env" {
 
 # Variables for servers
 
-variable "count_ubuntu" {
+variable "count_ub_serv" {
+  default = 0
+}
+
+variable "count_aml_serv" {
   default = 1
 }
 
-variable "count_am_lin" {
-  default = 1
+variable "inst_type" {
+  description = "Please enter instance type."
+  default     = "t2.micro"
 }
 
 variable "key_name" {
@@ -40,10 +45,9 @@ variable "key_name" {
   default     = "ga-frank"
 }
 
-
-variable "inst_type" {
-  description = "Please enter instance type."
-  default     = "t2.micro"
+variable "usr_dt_src_file" {
+  description = "Please enter file name for user data source template."
+  default     = "user_data.sh.tpl"
 }
 
 variable "dt_fl_ubuntu" {

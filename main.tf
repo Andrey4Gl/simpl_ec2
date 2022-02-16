@@ -40,38 +40,23 @@ data "aws_ami" "latest_amazon_linux" {
 }
 
 
-# AMI for MS Windows 2019 Base
-data "aws_ami" "latest_windows" {
-  owners      = ["801119661308"]
-  most_recent = true
-  filter {
-    name   = "name"
-    values = ["Windows_Server-2019-English-Full-Base-*"]
-  }
-}
-
-
-/* Select vpc by tag Name
-data "aws_vpc" "prod_vpc" {
-  tags = {
-    Name = "prod"
-  }
-}
-*/
+# -----------------------EIP--------------------------
 
 resource "aws_eip" "terr_static_ub" {
-  instance = aws_instance.server_ter01.id
+  count    = length(aws_instance.server_ter01)
+  instance = aws_instance.server_ter01[count.index].id
   tags = {
-    Name  = "elc_ip_ub_${var.pr_name}"
+    Name  = "elc_ip_ub_${count.index}_${var.pr_name}"
     Owner = var.pr_owner
     Env   = var.env
   }
 }
 
 resource "aws_eip" "terr_static_aml" {
-  instance = aws_instance.server_ter02.id
+  count    = length(aws_instance.server_ter02)
+  instance = aws_instance.server_ter02[count.index].id
   tags = {
-    Name  = "elc_ip_aml_${var.pr_name}"
+    Name  = "elc_ip_aml_${count.index}_${var.pr_name}"
     Owner = var.pr_owner
     Env   = var.env
   }
@@ -85,8 +70,9 @@ resource "aws_instance" "server_ter01" {
   instance_type     = var.inst_type
   key_name          = var.key_name
 
+  count = var.count_ub_serv
 
-  user_data = templatefile("user_data.sh.tpl", var.dt_fl_ubuntu)
+  user_data = templatefile(var.usr_dt_src_file, var.dt_fl_ubuntu)
 
   lifecycle {
     create_before_destroy = true
@@ -94,10 +80,8 @@ resource "aws_instance" "server_ter01" {
 
   vpc_security_group_ids = [aws_security_group.sg_ter01.id]
 
-  # depends_on = []
-
   tags = {
-    Name  = "Ub_Server_${var.pr_name}"
+    Name  = "${count.index}_Ub_Server_${var.pr_name}"
     Owner = var.pr_owner
     Env   = var.env
   }
@@ -110,6 +94,8 @@ resource "aws_instance" "server_ter02" {
   instance_type     = var.inst_type
   key_name          = var.key_name
 
+  count = var.count_aml_serv
+
   user_data = templatefile("user_data.sh.tpl", var.df_fl_aml)
 
   lifecycle {
@@ -118,10 +104,8 @@ resource "aws_instance" "server_ter02" {
 
   vpc_security_group_ids = [aws_security_group.sg_ter01.id]
 
-  # depends_on = []
-
   tags = {
-    Name  = "Amazon_Linux_Server_5.10_${var.pr_name}"
+    Name  = "${count.index}_Amazon_LS_5.10_${var.pr_name}"
     Owner = var.pr_owner
     Env   = var.env
   }
